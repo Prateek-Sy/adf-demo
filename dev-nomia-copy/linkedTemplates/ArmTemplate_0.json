@@ -1,0 +1,1090 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "dev-nomia-copy"
+		},
+		"AzureBlobStorage1_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureBlobStorage1'"
+		},
+		"AzureBlobStorage2_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureBlobStorage2'"
+		},
+		"trigger1_properties_pipeline1_parameters_customerId": {
+			"type": "string",
+			"defaultValue": "@triggerBody().folderPath"
+		},
+		"trigger1_properties_pipeline1_parameters_timestamp1": {
+			"type": "string",
+			"defaultValue": "@triggerBody().folderPath"
+		},
+		"trigger1_properties_typeProperties_scope": {
+			"type": "string",
+			"defaultValue": "/subscriptions/064cca4a-6570-4f63-8ebd-37a474533bd6/resourceGroups/ADF/providers/Microsoft.Storage/storageAccounts/demo56"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureBlobStorage1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('AzureBlobStorage1_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureBlobStorage2')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('AzureBlobStorage2_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline1')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Set variable1",
+						"type": "SetVariable",
+						"dependsOn": [],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "abc",
+							"value": {
+								"value": "@pipeline().parameters.customerId",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Set variable2",
+						"type": "SetVariable",
+						"dependsOn": [],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "xyz",
+							"value": {
+								"value": "@pipeline().parameters.timestamp1",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"customerId": {
+						"type": "string"
+					},
+					"timestamp1": {
+						"type": "string"
+					}
+				},
+				"variables": {
+					"abc": {
+						"type": "String"
+					},
+					"xyz": {
+						"type": "String"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DelimitedText1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "manual_product_catalogue_upload (1).csv",
+						"container": "sampledata"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "product_sku",
+						"type": "String"
+					},
+					{
+						"name": "name",
+						"type": "String"
+					},
+					{
+						"name": "title",
+						"type": "String"
+					},
+					{
+						"name": "description",
+						"type": "String"
+					},
+					{
+						"name": "brand",
+						"type": "String"
+					},
+					{
+						"name": "cost_price",
+						"type": "String"
+					},
+					{
+						"name": "price",
+						"type": "String"
+					},
+					{
+						"name": "ean_code",
+						"type": "String"
+					},
+					{
+						"name": "supplier_name",
+						"type": "String"
+					},
+					{
+						"name": "supplier_id",
+						"type": "String"
+					},
+					{
+						"name": "specifications",
+						"type": "String"
+					},
+					{
+						"name": "product_details",
+						"type": "String"
+					},
+					{
+						"name": "product_details_url",
+						"type": "String"
+					},
+					{
+						"name": "thumb_img_url",
+						"type": "String"
+					},
+					{
+						"name": "product_gallery",
+						"type": "String"
+					},
+					{
+						"name": "medium_img_url",
+						"type": "String"
+					},
+					{
+						"name": "categories",
+						"type": "String"
+					},
+					{
+						"name": "product_type",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DelimitedText2')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"container": "copydata"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Prop_0",
+						"type": "String"
+					},
+					{
+						"name": "id",
+						"type": "String"
+					},
+					{
+						"name": "initial_grading",
+						"type": "String"
+					},
+					{
+						"name": "has_damages",
+						"type": "String"
+					},
+					{
+						"name": "is_bios_locked",
+						"type": "String"
+					},
+					{
+						"name": "is_device_managed",
+						"type": "String"
+					},
+					{
+						"name": "is_external_power_available",
+						"type": "String"
+					},
+					{
+						"name": "is_headset_working",
+						"type": "String"
+					},
+					{
+						"name": "is_joystick_working",
+						"type": "String"
+					},
+					{
+						"name": "is_optical_drive_working",
+						"type": "String"
+					},
+					{
+						"name": "functional_trackpad",
+						"type": "String"
+					},
+					{
+						"name": "has_missing_drivers",
+						"type": "String"
+					},
+					{
+						"name": "is_usb_hub_working",
+						"type": "String"
+					},
+					{
+						"name": "keyboard_functional",
+						"type": "String"
+					},
+					{
+						"name": "keyboard_type",
+						"type": "String"
+					},
+					{
+						"name": "lot_id",
+						"type": "String"
+					},
+					{
+						"name": "mac_ports",
+						"type": "String"
+					},
+					{
+						"name": "mac_ports_not_working",
+						"type": "String"
+					},
+					{
+						"name": "microphone_working",
+						"type": "String"
+					},
+					{
+						"name": "missing_items",
+						"type": "String"
+					},
+					{
+						"name": "monitor_ports",
+						"type": "String"
+					},
+					{
+						"name": "name",
+						"type": "String"
+					},
+					{
+						"name": "network_locked",
+						"type": "String"
+					},
+					{
+						"name": "optical_drive_working",
+						"type": "String"
+					},
+					{
+						"name": "os_loading",
+						"type": "String"
+					},
+					{
+						"name": "processing_order_id",
+						"type": "String"
+					},
+					{
+						"name": "processing_order_state",
+						"type": "String"
+					},
+					{
+						"name": "screen_cracked",
+						"type": "String"
+					},
+					{
+						"name": "speaker_status",
+						"type": "String"
+					},
+					{
+						"name": "speaker_type",
+						"type": "String"
+					},
+					{
+						"name": "stand_value",
+						"type": "String"
+					},
+					{
+						"name": "state",
+						"type": "String"
+					},
+					{
+						"name": "touch_bar_status",
+						"type": "String"
+					},
+					{
+						"name": "touch_id_status",
+						"type": "String"
+					},
+					{
+						"name": "touchscreen_status",
+						"type": "String"
+					},
+					{
+						"name": "turns_on",
+						"type": "String"
+					},
+					{
+						"name": "type",
+						"type": "String"
+					},
+					{
+						"name": "user_id",
+						"type": "String"
+					},
+					{
+						"name": "video_card",
+						"type": "String"
+					},
+					{
+						"name": "video_output",
+						"type": "String"
+					},
+					{
+						"name": "video_output_not_working",
+						"type": "String"
+					},
+					{
+						"name": "water_damage",
+						"type": "String"
+					},
+					{
+						"name": "webcam_status",
+						"type": "String"
+					},
+					{
+						"name": "windows_hello_webcam_status",
+						"type": "String"
+					},
+					{
+						"name": "working_monitor_ports",
+						"type": "String"
+					},
+					{
+						"name": "write_date",
+						"type": "String"
+					},
+					{
+						"name": "write_uid",
+						"type": "String"
+					},
+					{
+						"name": "are_buttons_working",
+						"type": "String"
+					},
+					{
+						"name": "audio_available",
+						"type": "String"
+					},
+					{
+						"name": "audio_not_working",
+						"type": "String"
+					},
+					{
+						"name": "battery_cycle_count",
+						"type": "String"
+					},
+					{
+						"name": "battery_health_level",
+						"type": "String"
+					},
+					{
+						"name": "battery_qty",
+						"type": "String"
+					},
+					{
+						"name": "battery_status",
+						"type": "String"
+					},
+					{
+						"name": "categ_id",
+						"type": "String"
+					},
+					{
+						"name": "combined_headset_status",
+						"type": "String"
+					},
+					{
+						"name": "connectivity_available",
+						"type": "String"
+					},
+					{
+						"name": "connectivity_not_working",
+						"type": "String"
+					},
+					{
+						"name": "create_date",
+						"type": "String"
+					},
+					{
+						"name": "create_uid",
+						"type": "String"
+					},
+					{
+						"name": "data_ports",
+						"type": "String"
+					},
+					{
+						"name": "data_ports_not_working",
+						"type": "String"
+					},
+					{
+						"name": "display_name",
+						"type": "String"
+					},
+					{
+						"name": "display_value",
+						"type": "String"
+					},
+					{
+						"name": "eizo_test_1",
+						"type": "String"
+					},
+					{
+						"name": "eizo_test_2",
+						"type": "String"
+					},
+					{
+						"name": "eizo_test_3",
+						"type": "String"
+					},
+					{
+						"name": "eizo_test_4",
+						"type": "String"
+					},
+					{
+						"name": "eizo_test_5",
+						"type": "String"
+					},
+					{
+						"name": "eizo_test_6",
+						"type": "String"
+					},
+					{
+						"name": "eizo_test_7",
+						"type": "String"
+					},
+					{
+						"name": "eizo_test_8",
+						"type": "String"
+					},
+					{
+						"name": "eizo_test_9",
+						"type": "String"
+					},
+					{
+						"name": "eizo_test_10",
+						"type": "String"
+					},
+					{
+						"name": "eizo_test_11",
+						"type": "String"
+					},
+					{
+						"name": "eizo_test_12",
+						"type": "String"
+					},
+					{
+						"name": "eizo_test_13",
+						"type": "String"
+					},
+					{
+						"name": "erased",
+						"type": "String"
+					},
+					{
+						"name": "erased_type",
+						"type": "String"
+					},
+					{
+						"name": "erasure_duration",
+						"type": "String"
+					},
+					{
+						"name": "erasure_end",
+						"type": "String"
+					},
+					{
+						"name": "erasure_start",
+						"type": "String"
+					},
+					{
+						"name": "fingerprint_reader_status",
+						"type": "String"
+					},
+					{
+						"name": "fully_working",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DelimitedText3')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "valid-data.csv",
+						"container": "sampledata"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "product_sku",
+						"type": "String"
+					},
+					{
+						"name": "name",
+						"type": "String"
+					},
+					{
+						"name": "title",
+						"type": "String"
+					},
+					{
+						"name": "description",
+						"type": "String"
+					},
+					{
+						"name": "brand",
+						"type": "String"
+					},
+					{
+						"name": "cost_price",
+						"type": "String"
+					},
+					{
+						"name": "price",
+						"type": "String"
+					},
+					{
+						"name": "ean_code",
+						"type": "String"
+					},
+					{
+						"name": "supplier_name",
+						"type": "String"
+					},
+					{
+						"name": "supplier_id",
+						"type": "String"
+					},
+					{
+						"name": "specifications",
+						"type": "String"
+					},
+					{
+						"name": "product_details",
+						"type": "String"
+					},
+					{
+						"name": "product_details_url",
+						"type": "String"
+					},
+					{
+						"name": "thumb_img_url",
+						"type": "String"
+					},
+					{
+						"name": "product_gallery",
+						"type": "String"
+					},
+					{
+						"name": "medium_img_url",
+						"type": "String"
+					},
+					{
+						"name": "categories",
+						"type": "String"
+					},
+					{
+						"name": "product_type",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage2')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DelimitedText4')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"container": "copydata"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Prop_0",
+						"type": "String"
+					},
+					{
+						"name": "id",
+						"type": "String"
+					},
+					{
+						"name": "initial_grading",
+						"type": "String"
+					},
+					{
+						"name": "has_damages",
+						"type": "String"
+					},
+					{
+						"name": "is_bios_locked",
+						"type": "String"
+					},
+					{
+						"name": "is_device_managed",
+						"type": "String"
+					},
+					{
+						"name": "is_external_power_available",
+						"type": "String"
+					},
+					{
+						"name": "is_headset_working",
+						"type": "String"
+					},
+					{
+						"name": "is_joystick_working",
+						"type": "String"
+					},
+					{
+						"name": "is_optical_drive_working",
+						"type": "String"
+					},
+					{
+						"name": "functional_trackpad",
+						"type": "String"
+					},
+					{
+						"name": "has_missing_drivers",
+						"type": "String"
+					},
+					{
+						"name": "is_usb_hub_working",
+						"type": "String"
+					},
+					{
+						"name": "keyboard_functional",
+						"type": "String"
+					},
+					{
+						"name": "keyboard_type",
+						"type": "String"
+					},
+					{
+						"name": "lot_id",
+						"type": "String"
+					},
+					{
+						"name": "mac_ports",
+						"type": "String"
+					},
+					{
+						"name": "mac_ports_not_working",
+						"type": "String"
+					},
+					{
+						"name": "microphone_working",
+						"type": "String"
+					},
+					{
+						"name": "missing_items",
+						"type": "String"
+					},
+					{
+						"name": "monitor_ports",
+						"type": "String"
+					},
+					{
+						"name": "name",
+						"type": "String"
+					},
+					{
+						"name": "network_locked",
+						"type": "String"
+					},
+					{
+						"name": "optical_drive_working",
+						"type": "String"
+					},
+					{
+						"name": "os_loading",
+						"type": "String"
+					},
+					{
+						"name": "processing_order_id",
+						"type": "String"
+					},
+					{
+						"name": "processing_order_state",
+						"type": "String"
+					},
+					{
+						"name": "screen_cracked",
+						"type": "String"
+					},
+					{
+						"name": "speaker_status",
+						"type": "String"
+					},
+					{
+						"name": "speaker_type",
+						"type": "String"
+					},
+					{
+						"name": "stand_value",
+						"type": "String"
+					},
+					{
+						"name": "state",
+						"type": "String"
+					},
+					{
+						"name": "touch_bar_status",
+						"type": "String"
+					},
+					{
+						"name": "touch_id_status",
+						"type": "String"
+					},
+					{
+						"name": "touchscreen_status",
+						"type": "String"
+					},
+					{
+						"name": "turns_on",
+						"type": "String"
+					},
+					{
+						"name": "type",
+						"type": "String"
+					},
+					{
+						"name": "user_id",
+						"type": "String"
+					},
+					{
+						"name": "video_card",
+						"type": "String"
+					},
+					{
+						"name": "video_output",
+						"type": "String"
+					},
+					{
+						"name": "video_output_not_working",
+						"type": "String"
+					},
+					{
+						"name": "water_damage",
+						"type": "String"
+					},
+					{
+						"name": "webcam_status",
+						"type": "String"
+					},
+					{
+						"name": "windows_hello_webcam_status",
+						"type": "String"
+					},
+					{
+						"name": "working_monitor_ports",
+						"type": "String"
+					},
+					{
+						"name": "write_date",
+						"type": "String"
+					},
+					{
+						"name": "write_uid",
+						"type": "String"
+					},
+					{
+						"name": "are_buttons_working",
+						"type": "String"
+					},
+					{
+						"name": "audio_available",
+						"type": "String"
+					},
+					{
+						"name": "audio_not_working",
+						"type": "String"
+					},
+					{
+						"name": "battery_cycle_count",
+						"type": "String"
+					},
+					{
+						"name": "battery_health_level",
+						"type": "String"
+					},
+					{
+						"name": "battery_qty",
+						"type": "String"
+					},
+					{
+						"name": "battery_status",
+						"type": "String"
+					},
+					{
+						"name": "categ_id",
+						"type": "String"
+					},
+					{
+						"name": "combined_headset_status",
+						"type": "String"
+					},
+					{
+						"name": "connectivity_available",
+						"type": "String"
+					},
+					{
+						"name": "connectivity_not_working",
+						"type": "String"
+					},
+					{
+						"name": "create_date",
+						"type": "String"
+					},
+					{
+						"name": "create_uid",
+						"type": "String"
+					},
+					{
+						"name": "data_ports",
+						"type": "String"
+					},
+					{
+						"name": "data_ports_not_working",
+						"type": "String"
+					},
+					{
+						"name": "display_name",
+						"type": "String"
+					},
+					{
+						"name": "display_value",
+						"type": "String"
+					},
+					{
+						"name": "eizo_test_1",
+						"type": "String"
+					},
+					{
+						"name": "eizo_test_2",
+						"type": "String"
+					},
+					{
+						"name": "eizo_test_3",
+						"type": "String"
+					},
+					{
+						"name": "eizo_test_4",
+						"type": "String"
+					},
+					{
+						"name": "eizo_test_5",
+						"type": "String"
+					},
+					{
+						"name": "eizo_test_6",
+						"type": "String"
+					},
+					{
+						"name": "eizo_test_7",
+						"type": "String"
+					},
+					{
+						"name": "eizo_test_8",
+						"type": "String"
+					},
+					{
+						"name": "eizo_test_9",
+						"type": "String"
+					},
+					{
+						"name": "eizo_test_10",
+						"type": "String"
+					},
+					{
+						"name": "eizo_test_11",
+						"type": "String"
+					},
+					{
+						"name": "eizo_test_12",
+						"type": "String"
+					},
+					{
+						"name": "eizo_test_13",
+						"type": "String"
+					},
+					{
+						"name": "erased",
+						"type": "String"
+					},
+					{
+						"name": "erased_type",
+						"type": "String"
+					},
+					{
+						"name": "erasure_duration",
+						"type": "String"
+					},
+					{
+						"name": "erasure_end",
+						"type": "String"
+					},
+					{
+						"name": "erasure_start",
+						"type": "String"
+					},
+					{
+						"name": "fingerprint_reader_status",
+						"type": "String"
+					},
+					{
+						"name": "fully_working",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage2')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/trigger1')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Stopped",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "pipeline1",
+							"type": "PipelineReference"
+						},
+						"parameters": {
+							"customerId": "[parameters('trigger1_properties_pipeline1_parameters_customerId')]",
+							"timestamp1": "[parameters('trigger1_properties_pipeline1_parameters_timestamp1')]"
+						}
+					}
+				],
+				"type": "BlobEventsTrigger",
+				"typeProperties": {
+					"blobPathBeginsWith": "/manual/blobs/valid",
+					"blobPathEndsWith": ".csv",
+					"ignoreEmptyBlobs": true,
+					"scope": "[parameters('trigger1_properties_typeProperties_scope')]",
+					"events": [
+						"Microsoft.Storage.BlobCreated"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/pipeline1')]"
+			]
+		}
+	]
+}

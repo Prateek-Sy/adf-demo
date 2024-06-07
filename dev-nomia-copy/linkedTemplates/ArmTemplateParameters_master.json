@@ -1,0 +1,30 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "dev-nomia-copy"
+		},
+		"AzureBlobStorage1_connectionString": {
+			"value": ""
+		},
+		"AzureBlobStorage2_connectionString": {
+			"value": ""
+		},
+		"trigger1_properties_pipeline1_parameters_customerId": {
+			"value": "@triggerBody().folderPath"
+		},
+		"trigger1_properties_pipeline1_parameters_timestamp1": {
+			"value": "@triggerBody().folderPath"
+		},
+		"trigger1_properties_typeProperties_scope": {
+			"value": "/subscriptions/064cca4a-6570-4f63-8ebd-37a474533bd6/resourceGroups/ADF/providers/Microsoft.Storage/storageAccounts/demo56"
+		},
+		"containerUri": {
+			"value": ""
+		},
+		"containerSasToken": {
+			"value": ""
+		}
+	}
+}
