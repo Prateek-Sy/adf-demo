@@ -1,0 +1,9 @@
+{
+	"name": "dev-nomia-copy",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "9303b2a7-85e4-4016-99d7-d477993d7a54",
+		"tenantId": "006dbda8-87f1-4ddd-945a-76ca2d526b77"
+	}
+}
